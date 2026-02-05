@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white p-8 rounded-lg shadow">
+    <div class="mb-6 border-b pb-4">
+        <h2 class="text-2xl font-bold text-gray-800">
+            {% if is_edit %}
+                แก้ไขพาเลท {{ pallet.number }}
+            {% else %}
+                เพิ่มพาเลทให้ {{ coil.lot }}
+            {% endif %}
+        </h2>
+        <p class="text-sm text-gray-500">
+            {% if is_edit %}
+                อัปเดตข้อมูลพาเลทและรายการม้วนเหล็ก
+            {% else %}
+                กรอกข้อมูลพาเลทและระบุม้วนเหล็กภายใน
+            {% endif %}
+        </p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Pallet Info -->
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">รายละเอียดพาเลท</h3>
+        <div class="grid grid-cols-1 gap-4 mb-8">
+            {% for field in form %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="text-xs text-red-500 mt-1">{{ field.errors }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Coil Numbers Formset -->
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">ม้วนเหล็ก</h3>
+        {{ formset.management_form }}
+
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <div class="grid grid-cols-12 gap-4 mb-2 text-sm font-medium text-gray-500">
+                <div class="col-span-7">หมายเลขม้วน</div>
+                <div class="col-span-4">น้ำหนัก (กก.)</div>
+                <div class="col-span-1">ลบ</div>
+            </div>
+            
+            <div id="coil-form-container">
+            {% for coil_form in formset %}
+                <div class="grid grid-cols-12 gap-4 mb-2 items-start coil-row">
+                    {% for hidden in coil_form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    
+                    <div class="col-span-7">
+                        {{ coil_form.number }}
+                         {% if coil_form.number.errors %}
+                        <p class="text-xs text-red-500 mt-1">{{ coil_form.number.errors }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-span-4">
+                        {{ coil_form.weight }}
+                         {% if coil_form.weight.errors %}
+                        <p class="text-xs text-red-500 mt-1">{{ coil_form.weight.errors }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-span-1 pt-2">
+                        {% if formset.can_delete %}
+                            {{ coil_form.DELETE }}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+            
+            <button type="button" id="add-coil-btn" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-sm">
+                + เพิ่มม้วนเหล็ก
+            </button>
+        </div>
+
+        <!-- Empty Form Template -->
+        <div id="empty-form" class="hidden">
+            <div class="grid grid-cols-12 gap-4 mb-2 items-start coil-row">
+                <div class="col-span-7">
+                    {{ formset.empty_form.number }}
+                </div>
+                <div class="col-span-4">
+                    {{ formset.empty_form.weight }}
+                </div>
+                <div class="col-span-1 pt-2">
+                    <input type="checkbox" name="coilnumber_set-__prefix__-DELETE" id="id_coilnumber_set-__prefix__-DELETE">
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const addBtn = document.getElementById('add-coil-btn');
+                const container = document.getElementById('coil-form-container');
+                const totalForms = document.getElementById('id_coilnumber_set-TOTAL_FORMS');
+                const emptyFormTemplate = document.getElementById('empty-form').innerHTML; // Use innerHTML to get the content
+                
+                addBtn.addEventListener('click', function() {
+                    let formCount = parseInt(totalForms.value);
+                    // Replace __prefix__ with the current form count
+                    const newRowHtml = emptyFormTemplate.replace(/__prefix__/g, formCount);
+                    
+                    // Create a temporary container to turn HTML string into elements
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = newRowHtml;
+                    const newRow = tempDiv.firstElementChild;
+                    
+                    container.appendChild(newRow);
+                    
+                    totalForms.value = formCount + 1;
+                });
+            });
+        </script>
+        
+        <div class="flex justify-end pt-4 border-t">
+            <a href="{% url 'coil:coilin_detail' coil.pk %}" class="bg-gray-100 text-gray-700 font-bold py-2 px-4 rounded mr-2 hover:bg-gray-200">ยกเลิก</a>
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow">
+                {% if is_edit %}
+                    อัปเดตพาเลท
+                {% else %}
+                    บันทึกพาเลท
+                {% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

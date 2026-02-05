@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Print Labels</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: #fff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            padding: 10px;
+        }
+        .label-container {
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+        @media print {
+            body { margin: 0; padding: 5px; }
+            .label-container { max-width: 100%; width: 100%; }
+            .page-break { page-break-after: always; }
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        td, th {
+            border: 2px solid #000;
+            padding: 6px 10px;
+            vertical-align: middle;
+        }
+
+        .bg-green { background-color: #d8f0d8; }
+        .text-magenta { color: #e91e8c; }
+        .font-bold { font-weight: 600; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-xl { font-size: 1.5rem; }
+        .text-2xl { font-size: 1.75rem; }
+        .text-3xl { font-size: 2rem; }
+
+        .main-wrapper {
+            display: flex;
+            gap: 0;
+        }
+        .left-table {
+            flex: 1;
+        }
+        .right-table {
+            flex: 1;
+            margin-left: -2px; /* Overlap border */
+        }
+        .left-table table,
+        .right-table table {
+            width: 100%;
+            height: 100%;
+        }
+        .left-table td {
+            height: 40px;
+        }
+        .right-table td {
+            height: 40px;
+        }
+        .dimension-cell {
+            height: 80px !important;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="label-container">
+        {% for pallet in pallets %}
+        <div class="mb-8 page-break" style="margin-bottom: 30px;">
+
+            <div class="main-wrapper">
+                <!-- LEFT TABLE -->
+                <div class="left-table">
+                    <table>
+                        <!-- Row 1: Lot + Pallet Number -->
+                        <tr>
+                            <td class="bg-green font-bold text-xl" style="width: 60%;">
+                                {{ coil.lot }}-{{ coil.supplier.name }}
+                            </td>
+                            <td class="bg-green font-bold text-2xl text-magenta text-center" style="width: 40%;">
+                                {{ pallet.number }}
+                            </td>
+                        </tr>
+
+                        <!-- Row 2: Dimensions (merged) -->
+                        <tr>
+                            <td colspan="2" class="bg-green dimension-cell text-center">
+                                {{ pallet.type0.thickness }} x {{ pallet.type0.width }}
+                            </td>
+                        </tr>
+
+                        <!-- Row 3: Grade & Color Labels -->
+                        <tr>
+                            <td class="bg-green font-bold">เกรด</td>
+                            <td class="bg-green font-bold text-center">สี</td>
+                        </tr>
+
+                        <!-- Row 4: Grade & Color Values -->
+                        <tr>
+                            <td class="bg-green text-xl">{{ pallet.type0.grade }}</td>
+                            <td class="bg-green text-xl text-center">{{ pallet.type0.color }}</td>
+                        </tr>
+
+                        <!-- Empty rows -->
+                        <tr>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                        </tr>
+
+                        <!-- Row: Total Count -->
+                        <tr>
+                            <td class="bg-green font-bold">รวม</td>
+                            <td class="bg-green font-bold text-right">{{ pallet.total_count }} ม้วน</td>
+                        </tr>
+
+                        <!-- Row: Total Weight -->
+                        <tr>
+                            <td class="bg-green font-bold">น้ำหนัก</td>
+                            <td class="bg-green font-bold text-right">{{ pallet.total_weight }} kg</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- RIGHT TABLE -->
+                <div class="right-table">
+                    <table>
+                        <!-- Row 1: Date Header -->
+                        <tr>
+                            <td class="bg-green font-bold" colspan="2">เหล็กเข้า</td>
+                            <td class="bg-green text-center">:</td>
+                            <td class="bg-green font-bold text-right">{{ coil.timestamp2|date:"j/n/Y" }}</td>
+                        </tr>
+
+                        <!-- Row 2: Table Headers -->
+                        <tr>
+                            <td class="bg-green font-bold text-center" style="width: 50px;">C#</td>
+                            <td class="bg-green font-bold text-center" style="width: 80px;">NW</td>
+                            <td class="bg-green text-center" style="width: 40px;"></td>
+                            <td class="bg-green font-bold">Note</td>
+                        </tr>
+
+                        <!-- Coil Rows -->
+                        {% for c in pallet.all_coils %}
+                        <tr>
+                            <td class="bg-green text-center">{{ c.number }}</td>
+                            <td class="bg-green text-right">{{ c.weight }}</td>
+                            <td class="bg-green text-center">kg</td>
+                            <td class="bg-green"></td>
+                        </tr>
+                        {% endfor %}
+
+                        <!-- Empty rows for spacing -->
+                        {% if pallet.all_coils|length < 6 %}
+                        <tr>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                            <td class="bg-green">&nbsp;</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>

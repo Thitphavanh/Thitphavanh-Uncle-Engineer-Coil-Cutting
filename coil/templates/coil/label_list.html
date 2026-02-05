@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">รายการ Label ทั้งหมด</h1>
+                <p class="text-gray-500 mt-1">เลือก Label เพื่อพิมพ์</p>
+            </div>
+            <a href="{% url 'coil:index' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded">
+                กลับหน้าแรก
+            </a>
+        </div>
+    </div>
+
+    <!-- Label List -->
+    {% if coils %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for coil in coils %}
+        <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+            <div class="p-6">
+                <!-- Lot Number -->
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">{{ coil.lot }}</h2>
+                    <p class="text-sm text-gray-500">{{ coil.timestamp2|date:"d/m/Y" }}</p>
+                </div>
+
+                <!-- Info -->
+                <div class="mb-4 space-y-2">
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500 w-24">Supplier:</span>
+                        <span class="font-medium text-gray-700">{{ coil.supplier.name }}</span>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500 w-24">Owner:</span>
+                        <span class="font-medium text-gray-700">{{ coil.owner.name }}</span>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500 w-24">Pallets:</span>
+                        <span class="font-medium text-gray-700">{{ coil.pallet_count }} พาเลท</span>
+                    </div>
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500 w-24">Total Coils:</span>
+                        <span class="font-medium text-gray-700">{{ coil.total_coils }} ม้วน</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-2">
+                    <a href="{% url 'coil:coilin_detail' coil.pk %}"
+                       class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-center font-bold py-2 px-4 rounded">
+                        ดูรายละเอียด
+                    </a>
+                    <a href="{% url 'coil:print_labels' coil.pk %}"
+                       target="_blank"
+                       class="flex-1 bg-green-500 hover:bg-green-600 text-white text-center font-bold py-2 px-4 rounded">
+                        พิมพ์ Label
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white p-12 rounded-lg shadow text-center">
+        <p class="text-gray-500 text-lg mb-4">ยังไม่มีข้อมูล Label ในระบบ</p>
+        <a href="{% url 'coil:coilin_create' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block">
+            สร้าง Coil In ใหม่
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

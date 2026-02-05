@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-3 gap-4 mt-8">
+   <!-- Row 1 -->
+        {% if user.is_staff %}
+        <a href="{% url 'coil:coilin_create' %}" class="block">
+            <div class="border border-gray-200 p-12 rounded hover:border-gray-400 transition cursor-pointer bg-white flex items-center justify-center">
+                 <span class="text-base font-medium text-gray-900">รับเหล็กเข้า</span>
+            </div>
+        </a>
+
+        <a href="{% url 'coil:coilin_list' %}" class="block">
+            <div class="border border-gray-200 p-12 rounded hover:border-gray-400 transition cursor-pointer bg-white flex items-center justify-center">
+                <span class="text-base font-medium text-gray-900">ข้อมูลเหล็กเข้า</span>
+            </div>
+        </a>
+
+        <!-- Row 2 -->
+        <a href="{% url 'coil:label_list' %}" class="block">
+            <div class="border border-gray-200 p-12 rounded hover:border-gray-400 transition cursor-pointer bg-white flex items-center justify-center">
+                <span class="text-base font-medium text-gray-900">พิมพ์ใบปะหน้า</span>
+            </div>
+        </a>
+        {% endif %}
+
+    </div>
+
+    <!-- Coil Out Section (Centered) -->
+    <div class="flex justify-center gap-4 mt-8">
+        <a href="{% url 'coil:coilout_create' %}" class="block w-1/3">
+            <div class="border border-gray-200 p-12 rounded hover:border-gray-400 transition cursor-pointer bg-white flex items-center justify-center">
+                <span class="text-base font-medium text-gray-900">เบิกเหล็กออก</span>
+            </div>
+        </a>
+
+        <a href="{% url 'coil:coilout_list' %}" class="block w-1/3">
+            <div class="border border-gray-200 p-12 rounded hover:border-gray-400 transition cursor-pointer bg-white flex items-center justify-center">
+                <span class="text-base font-medium text-gray-900">ข้อมูลเหล็กออก</span>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">รายละเอียดการเบิกออก</h1>
+                <p class="text-gray-500 mt-1">หมายเลขม้วน: {{ coilout.coil_number }}</p>
+            </div>
+            <a href="{% url 'coil:coilout_list' %}"
+               class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded">
+                กลับรายการ
+            </a>
+        </div>
+    </div>
+
+    <!-- Details -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- วันที่/เวลา -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">วันที่/เวลา</h3>
+                <p class="mt-1 text-lg text-gray-900">
+                    {% if coilout.timestamp1 %}
+                    {{ coilout.timestamp1|date:"d/m/Y H:i" }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- ผู้ใช้งาน -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">ผู้ใช้งาน</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.user }}</p>
+            </div>
+
+            <!-- หมายเลขม้วน -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">หมายเลขม้วน</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.coil_number }}</p>
+            </div>
+
+            <!-- SKU -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">SKU</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.sku }}</p>
+            </div>
+
+            <!-- เต็มม้วน/บางส่วน -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">เต็มม้วน/บางส่วน</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.full_coil_partial|default:"-" }}</p>
+            </div>
+
+            <!-- น้ำหนัก -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">น้ำหนัก (kg)</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.coil_kg|default:"-" }}</p>
+            </div>
+
+            <!-- ประเภท -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">ประเภท</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.type0|default:"-" }}</p>
+            </div>
+
+            <!-- เลขงาน -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">เลขงาน</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.job_number|default:"-" }}</p>
+            </div>
+
+            <!-- ชื่องาน -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">ชื่องาน (ย่อ)</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.job_name_short|default:"-" }}</p>
+            </div>
+
+            <!-- จำนวน -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">จำนวน</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.job_qty|default:"-" }}</p>
+            </div>
+
+            <!-- แผนกที่ตัด -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">แผนกที่ตัด</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.department_cutting|default:"-" }}</p>
+            </div>
+
+            <!-- อัพเดทล่าสุด -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-500">อัพเดทล่าสุด</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.timestamp2|date:"d/m/Y" }}</p>
+            </div>
+
+            <!-- หมายเหตุ -->
+            <div class="md:col-span-2">
+                <h3 class="text-sm font-medium text-gray-500">หมายเหตุ</h3>
+                <p class="mt-1 text-lg text-gray-900">{{ coilout.note_1|default:"-" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

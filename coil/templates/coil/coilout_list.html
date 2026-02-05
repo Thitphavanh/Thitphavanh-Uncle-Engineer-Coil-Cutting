@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">รายการเบิกเหล็ก</h1>
+                <p class="text-gray-500 mt-1">รายการเหล็กที่ตัดออก</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'coil:index' %}"
+                   class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded">
+                    กลับหน้าแรก
+                </a>
+                <a href="{% url 'coil:coilout_create' %}"
+                   class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    + สร้างรายการเบิกออก
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table for Desktop -->
+    {% if coilouts %}
+    <!-- Desktop View (hidden on mobile) -->
+    <div class="hidden lg:block bg-white rounded-lg shadow overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่/เวลา</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หมายเลขม้วน</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เต็ม/บางส่วน</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">น้ำหนัก (kg)</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เลขงาน</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">แผนกที่ตัด</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การจัดการ</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for coilout in coilouts %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {% if coilout.timestamp1 %}
+                        {{ coilout.timestamp1|date:"d/m/Y H:i" }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {{ coilout.coil_number }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900">
+                        {{ coilout.sku }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {{ coilout.full_coil_partial|default:"-" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {{ coilout.coil_kg|default:"-" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {{ coilout.job_number|default:"-" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {{ coilout.department_cutting|default:"-" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                        <a href="{% url 'coil:coilout_detail' coilout.pk %}"
+                           class="text-blue-600 hover:text-blue-900">
+                            ดูรายละเอียด
+                        </a>
+                        <a href="{% url 'coil:coilout_update' coilout.pk %}" class="text-yellow-600 hover:text-yellow-900">แก้ไข</a>
+                        <a href="{% url 'coil:coilout_delete' coilout.pk %}" class="text-red-600 hover:text-red-900">ลบ</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile View (Card Layout) -->
+    <div class="lg:hidden space-y-4">
+        {% for coilout in coilouts %}
+        <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">{{ coilout.coil_number }}</h3>
+                    <p class="text-xs text-gray-500">
+                        {% if coilout.timestamp1 %}
+                        {{ coilout.timestamp1|date:"d/m/Y H:i" }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </p>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {{ coilout.full_coil_partial|default:"-" }}
+                </span>
+            </div>
+
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">SKU:</span>
+                    <span class="text-gray-900 font-medium text-right">{{ coilout.sku }}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">น้ำหนัก:</span>
+                    <span class="text-gray-900">{{ coilout.coil_kg|default:"-" }} kg</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">เลขงาน:</span>
+                    <span class="text-gray-900">{{ coilout.job_number|default:"-" }}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">แผนกที่ตัด:</span>
+                    <span class="text-gray-900">{{ coilout.department_cutting|default:"-" }}</span>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-3 border-t">
+                <a href="{% url 'coil:coilout_detail' coilout.pk %}"
+                   class="flex-1 text-center bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-3 rounded">
+                    ดูรายละเอียด
+                </a>
+                <a href="{% url 'coil:coilout_update' coilout.pk %}"
+                   class="flex-1 text-center bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold py-2 px-3 rounded">
+                    แก้ไข
+                </a>
+                <a href="{% url 'coil:coilout_delete' coilout.pk %}"
+                   class="flex-1 text-center bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-2 px-3 rounded">
+                    ลบ
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white p-12 rounded-lg shadow text-center">
+        <p class="text-gray-500 text-lg mb-4">ยังไม่มีข้อมูลการเบิกออกในระบบ</p>
+        <a href="{% url 'coil:coilout_create' %}"
+           class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block">
+            สร้างรายการเบิกออกใหม่
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
