@@ -33,6 +33,13 @@ def setup_rbac():
     # 2. Create Users and Assign Groups
     users_config = [
         {
+            'username': 'admin',
+            'password': 'ADMIN123123',
+            'groups': ['SKU_Manager', 'Coil_In', 'Coil_Out', 'Adjuster', 'Viewer'],
+            'is_superuser': True,
+            'is_staff': True
+        },
+        {
             'username': 'user1',
             'password': 'PWD123123',
             'groups': ['SKU_Manager', 'Coil_In', 'Coil_Out', 'Adjuster', 'Viewer']
@@ -69,14 +76,18 @@ def setup_rbac():
             print(f"Creating User: {username}")
         
         user.set_password(password)
-        # Assuming these are non-staff/superuser by default based on requirement description "admin" is separate
-        # But for them to login to admin site? No, "People key-in" usually means frontend. 
-        # But current views use `is_staff` check.
-        # User request: "Separate rights... Admin (is separate)".
-        # So these probably shouldn't be superusers.
-        # However, `views.py` currently checks `is_staff` or `is_admin`.
-        # I will need to update `views.py` permissions logic as planned. 
-        # For now, I'll set them as active. 
+        if config.get('is_superuser'):
+            user.is_superuser = True
+            print(f"Set {username} as Superuser")
+        else:
+            user.is_superuser = False
+            
+        if config.get('is_staff'):
+            user.is_staff = True
+            print(f"Set {username} as Staff")
+        else:
+            user.is_staff = False
+
         user.is_active = True
         user.save()
 

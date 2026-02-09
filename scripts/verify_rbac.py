@@ -47,7 +47,7 @@ def test_rbac():
     
     client.force_login(user2)
     resp = client.get(url)
-    print(f"Coil In (user2): {resp.status_code} (Expected 200)")
+    print(f"Coil In (user2): {resp.status_code} (Expected 200)") # User2 now has Coil Out
     
     client.force_login(user1)
     resp = client.get(url)
@@ -59,11 +59,15 @@ def test_rbac():
     
     client.force_login(view4)
     resp = client.get(url)
-    print(f"Viewer (view4): {resp.status_code} (Expected 302/403)")
+    print(f"Viewer (view4): {resp.status_code} (Expected 302/400/403)")
     
     client.force_login(user3)
     resp = client.get(url)
     print(f"Coil Out (user3): {resp.status_code} (Expected 200)")
+
+    client.force_login(user2)
+    resp = client.get(url)
+    print(f"Coil In (user2): {resp.status_code} (Expected 200) - New Requirement")
 
     # 2. Test Template Visibility (Check for button text)
     print("\n--- Testing Template Visibility ---")
@@ -74,24 +78,15 @@ def test_rbac():
     
     client.force_login(view4)
     resp = client.get(url)
-    if b'skuModal' in resp.content and b'hidden' not in resp.content: # Button reveals modal? No, check for button HTML
-        # Button HTML: <button id="openSkuModal" ...
-        has_button = b'id="openSkuModal"' in resp.content
-        print(f"Viewer (view4): Has button? {has_button} (Expected False)")
-    else:
-        has_button = b'id="openSkuModal"' in resp.content
-        print(f"Viewer (view4): Has button? {has_button} (Expected False)")
+    has_button = b'id="openSkuModal"' in resp.content
+    print(f"Viewer (view4): Has button? {has_button} (Expected False)")
 
     client.force_login(user1)
     resp = client.get(url)
     has_button = b'id="openSkuModal"' in resp.content
     print(f"Admin (user1): Has button? {has_button} (Expected True)")
 
-    # Coil In List - "New Coil In" (Only Coil_In: user1, user2)
-    url = reverse('coil:coilin_list') # Wait, I didn't add button to coilin_list? 
-    # Ah, I decided NOT to add it to coilin_list because it wasn't there.
-    # But I updated coilout_list. Let's test coilout_list.
-    
+    # Coil Out List - "New Coil Out"
     url = reverse('coil:coilout_list')
     print(f"\nTesting {url} for 'New Coil Out' button")
     
@@ -104,6 +99,11 @@ def test_rbac():
     resp = client.get(url)
     has_button = b'coilout/create/' in resp.content
     print(f"Coil Out (user3): Has button? {has_button} (Expected True)")
+
+    client.force_login(user2)
+    resp = client.get(url)
+    has_button = b'coilout/create/' in resp.content
+    print(f"Coil In (user2): Has button? {has_button} (Expected True)")
 
     # 3. Test Login/Logout
     print("\n--- Testing Login/Logout ---")
