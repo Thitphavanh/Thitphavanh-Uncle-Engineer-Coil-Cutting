@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+import re
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -59,6 +60,11 @@ class SKU(models.Model):
                                     str(self.width or '') if self.width else '', 
                                     str(self.length or '') if self.length else '']))
         
+        # Clean color (strip Thai characters)
+        color_val = str(self.color) if self.color else ''
+        if color_val:
+            color_val = re.sub(r'[\u0E00-\u0E7F]+', '', color_val)
+
         # 2. Collect dash-separated parts
         parts = []
         if self.name: parts.append(str(self.name))
@@ -66,16 +72,19 @@ class SKU(models.Model):
         if self.Type1: parts.append(str(self.Type1))
         if self.Type2: parts.append(str(self.Type2))
         if dims: parts.append(dims)
-        if self.color: parts.append(str(self.color))
+        if color_val: parts.append(color_val)
         if self.grade: parts.append(str(self.grade))
         if self.note1: parts.append(str(self.note1))
         
         main_str = "-".join(parts)
         
         # 3. Add note2 with a space separator if it exists
-        if self.note2:
-            return f"{main_str} {self.note2}"
-        return main_str
+        full_str = f"{main_str} {self.note2}" if self.note2 else main_str
+
+        # Clean up any double dashes is still good practice
+        cleaned_str = re.sub(r'-+', '-', full_str).strip('- ')
+
+        return cleaned_str
 
 class CoilPallet(models.Model):
     coilin = models.ForeignKey(CoilIn, on_delete=models.CASCADE)
@@ -92,7 +101,13 @@ class CoilNumber(models.Model):
     weight = models.FloatField(null=True, blank=True)
 
     def __str__(self):
-        return self.number or f"Coil #{self.pk}"
+        # Format: Lot-PalletNumber-CoilNumber
+        # e.g., K-25007-PL03(3)-C02
+        try:
+            return f"{self.coilpallet.coilin.lot}-{self.coilpallet.number}-{self.number}"
+        except AttributeError:
+            # Fallback if relationships are missing
+            return self.number or f"Coil #{self.pk}"
 
 class Label(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)

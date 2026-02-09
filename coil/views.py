@@ -4,14 +4,24 @@ from django.urls import reverse
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.decorators import user_passes_test
 from .models import CoilIn, CoilPallet, CoilOut
-from .forms import CoilInForm, CoilPalletForm, CoilNumberFormSet, CoilOutForm
+from django.contrib import messages
+from .forms import CoilInForm, CoilPalletForm, CoilNumberFormSet, CoilOutForm, SKUForm
 
 def is_admin(user):
     return user.is_staff
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    if request.method == 'POST':
+        form = SKUForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'บันทึก SKU เรียบร้อยแล้ว')
+            return redirect('coil:index')  # Redirect to clear POST data
+    else:
+        form = SKUForm()
+        
+    return render(request, 'index.html', {'form': form})
 
 @user_passes_test(is_admin)
 def coilin_list(request):
@@ -61,13 +71,15 @@ def add_pallet(request, pk, pallet_pk=None):
             pallet.coilin = coil
             pallet.save()
 
+            # Save the formset with the pallet as the instance
             instances = formset.save(commit=False)
             for instance in instances:
                 instance.coilpallet = pallet
                 instance.save()
 
-            # Handle deletions
-            formset.save()
+            # Handle deletions from formset
+            for obj in formset.deleted_objects:
+                obj.delete()
 
             return redirect('coil:coilin_detail', pk=coil.pk)
     else:

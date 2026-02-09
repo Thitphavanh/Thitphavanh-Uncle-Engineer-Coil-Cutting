@@ -12,8 +12,7 @@ from .base import *
 DEBUG = False
 
 # SECURITY: Update this with your actual domain names
-ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
-
+# ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -33,9 +32,9 @@ DATABASES = {
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', SECRET_KEY)
 
 # HTTPS settings
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 # HSTS settings
 SECURE_HSTS_SECONDS = 31536000  # 1 year
