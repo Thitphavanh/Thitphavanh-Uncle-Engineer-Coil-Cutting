@@ -44,7 +44,47 @@
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+    <!-- jQuery & Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <style>
+        /* Custom Select2 Styling to match Tailwind */
+        .select2-container .select2-selection--single {
+            height: 42px;
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 6px 12px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 28px;
+            color: #111827; /* gray-900 */
+        }
+        .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+    </style>
+
     <script>
+        $(document).ready(function() {
+            // Initialize Select2
+            $('#id_coil_number').select2({
+                placeholder: 'ค้นหาหมายเลขม้วน',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Ensure vanilla JS change listener catches Select2 changes
+            $('#id_coil_number').on('change', function() {
+                this.dispatchEvent(new Event('change'));
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Flatpickr
             flatpickr(".datetimepicker", {
@@ -56,10 +96,58 @@
 
             const coilSelect = document.getElementById('id_coil_number');
             const skuSelect = document.getElementById('id_sku');
+            const fullPartialSelect = document.getElementById('id_full_coil_partial');
+            const weightInput = document.getElementById('id_coil_kg');
+            let activeCoilWeight = 0;
 
             if (coilSelect && skuSelect) {
                 // Store original SKU select HTML to restore if needed
                 const originalSkuHTML = skuSelect.innerHTML;
+
+                function updateWeightLogic() {
+                    if (!activeCoilWeight) return;
+                    
+                    const mode = fullPartialSelect.value;
+                    if (mode === 'เต็มม้วน') {
+                        weightInput.value = activeCoilWeight;
+                        weightInput.readOnly = true; // Optional: lock it? User said "pull value", maybe editable? Plan said auto-fill. ReadOnly is safer for "Full".
+                        // Remove validity error if any
+                        weightInput.setCustomValidity('');
+                    } else if (mode === 'บางส่วน') {
+                        weightInput.readOnly = false;
+                        // specific validation logic is in checkWeightLimit
+                    } else {
+                        weightInput.readOnly = false;
+                        weightInput.value = '';
+                    }
+                    checkWeightLimit(); // Re-check limit after mode change
+                }
+
+                function checkWeightLimit() {
+                    if (!activeCoilWeight || fullPartialSelect.value !== 'บางส่วน') {
+                         weightInput.setCustomValidity('');
+                         return;
+                    }
+                    
+                    const currentWeight = parseFloat(weightInput.value);
+                    if (isNaN(currentWeight) || currentWeight <= 0) {
+                        weightInput.setCustomValidity('กรุณากรอกน้ำหนักที่ถูกต้อง');
+                        weightInput.reportValidity();
+                    } else if (currentWeight > activeCoilWeight) {
+                        weightInput.setCustomValidity(`น้ำหนักเกิน! น้ำหนักม้วนจริงคือ ${activeCoilWeight} กก.`);
+                        weightInput.reportValidity();
+                    } else {
+                        weightInput.setCustomValidity('');
+                    }
+                }
+
+                if (fullPartialSelect) {
+                    fullPartialSelect.addEventListener('change', updateWeightLogic);
+                }
+                
+                if (weightInput) {
+                    weightInput.addEventListener('input', checkWeightLimit);
+                }
 
                 coilSelect.addEventListener('change', function() {
                     const coilId = this.value;
@@ -67,7 +155,7 @@
                     if (coilId) {
                         // Show loading state
                         skuSelect.disabled = true;
-                        const currentValue = skuSelect.value;
+                        const originalSkuText = skuSelect.options[skuSelect.selectedIndex]?.text; // Keep current if valid? No, usually loading.
                         skuSelect.innerHTML = '<option value="">กำลังโหลด...</option>';
 
                         // Build URL with correct path including 'coil' prefix
@@ -78,7 +166,11 @@
                             .then(response => {
                                 console.log('Response status:', response.status);
                                 if (!response.ok) {
-                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                    return response.json().then(data => {
+                                        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                                    }).catch(() => {
+                                        throw new Error(`HTTP error! status: ${response.status}`);
+                                    });
                                 }
                                 return response.json();
                             })
@@ -92,7 +184,19 @@
                                     // Set the SKU value
                                     skuSelect.value = data.sku_id;
                                     console.log('SKU auto-filled:', data.sku_name);
-                                } else if (data.error) {
+                                } 
+                                
+                                if (data.weight) {
+                                    activeCoilWeight = parseFloat(data.weight);
+                                    console.log('Coil Weight:', activeCoilWeight);
+                                    updateWeightLogic(); // Update immediately if mode is already selected
+                                } else {
+                                    activeCoilWeight = 0; // Reset if no weight data
+                                    weightInput.value = '';
+                                    weightInput.readOnly = false;
+                                }
+
+                                if (data.error) {
                                     console.error('Error from server:', data.error);
                                     alert('ไม่สามารถดึงข้อมูล SKU ได้: ' + data.error);
                                 }
@@ -103,10 +207,17 @@
                                 skuSelect.disabled = false;
                                 console.error('Error fetching SKU:', error);
                                 alert('เกิดข้อผิดพลาดในการดึงข้อมูล SKU: ' + error.message);
+                                activeCoilWeight = 0; // Reset on error
+                                weightInput.value = '';
+                                weightInput.readOnly = false;
                             });
                     } else {
-                        // Clear SKU if no coil selected
+                        // Clear SKU and weight if no coil selected
                         skuSelect.value = '';
+                        activeCoilWeight = 0;
+                        weightInput.value = '';
+                        weightInput.readOnly = false; // Ensure it's editable if no coil
+                        weightInput.setCustomValidity(''); // Clear any validation
                     }
                 });
             } else {

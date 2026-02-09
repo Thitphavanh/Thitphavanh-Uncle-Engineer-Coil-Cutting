@@ -16,14 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+import django.shortcuts
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 from coil import views as coil_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/get-sku/<int:pk>/', coil_views.get_coil_sku, name='api_get_coil_sku'),
     path('', include('coil.urls')),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    # Test Error Pages
+    path('403/', lambda request: django.shortcuts.render(request, '403.html'), name='403'),
+    path('404/', lambda request: django.shortcuts.render(request, '404.html'), name='404'),
 
 ]
 

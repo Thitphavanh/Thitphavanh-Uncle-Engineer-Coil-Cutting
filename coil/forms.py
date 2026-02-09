@@ -118,7 +118,7 @@ class CoilOutForm(forms.ModelForm):
             'type0': 'ประเภท',
             'job_number': 'เลขงาน',
             'job_name_short': 'ชื่องาน (ย่อ)',
-            'job_qty': 'จำนวน',
+            'job_qty': 'จำนวน (ชิ้น)',
             'department_cutting': 'แผนกที่ตัด',
             'note_1': 'หมายเหตุ',
         }

@@ -74,6 +74,7 @@ class SKU(models.Model):
         if dims: parts.append(dims)
         if color_val: parts.append(color_val)
         if self.grade: parts.append(str(self.grade))
+        if self.manufacturer: parts.append(str(self.manufacturer))
         if self.note1: parts.append(str(self.note1))
         
         main_str = "-".join(parts)
@@ -97,8 +98,11 @@ class CoilPallet(models.Model):
 
 class CoilNumber(models.Model):
     coilpallet = models.ForeignKey(CoilPallet, on_delete=models.CASCADE)
-    number = models.CharField(max_length=255, unique=True)
+    number = models.CharField(max_length=255)
     weight = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('coilpallet', 'number')
 
     def __str__(self):
         # Format: Lot-PalletNumber-CoilNumber

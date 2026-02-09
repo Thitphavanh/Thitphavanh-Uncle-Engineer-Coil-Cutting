@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load coil_extras %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,10 +15,12 @@
                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded">
                     กลับหน้าแรก
                 </a>
+                {% if request.user|is_coil_out %}
                 <a href="{% url 'coil:coilout_create' %}"
                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
                     + สร้างรายการเบิกออก
                 </a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -72,8 +75,10 @@
                            class="text-blue-600 hover:text-blue-900">
                             ดูรายละเอียด
                         </a>
+                        {% if request.user|is_adjuster %}
                         <a href="{% url 'coil:coilout_update' coilout.pk %}" class="text-yellow-600 hover:text-yellow-900">แก้ไข</a>
                         <a href="{% url 'coil:coilout_delete' coilout.pk %}" class="text-red-600 hover:text-red-900">ลบ</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -125,6 +130,7 @@
                    class="flex-1 text-center bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-3 rounded">
                     ดูรายละเอียด
                 </a>
+                {% if request.user|is_adjuster %}
                 <a href="{% url 'coil:coilout_update' coilout.pk %}"
                    class="flex-1 text-center bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold py-2 px-3 rounded">
                     แก้ไข
@@ -133,6 +139,7 @@
                    class="flex-1 text-center bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-2 px-3 rounded">
                     ลบ
                 </a>
+                {% endif %}
             </div>
         </div>
         {% endfor %}

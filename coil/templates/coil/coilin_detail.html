@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load coil_extras %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -8,6 +9,7 @@
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">ล็อต: {{ coil.lot }}</h1>
                 <p class="text-gray-500 mt-1">วันที่: {{ coil.timestamp2|date:"d/m/Y" }}</p>
+                <p class="text-gray-500 mt-1">น้ำหนักรวม: {{ total_weight|floatformat:2 }} kg</p>
             </div>
             <div class="text-right">
                 <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
@@ -27,9 +29,11 @@
             <a href="{% url 'coil:print_labels' coil.pk %}" target="_blank" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded shadow">
                 พิมพ์ใบปะหน้า
             </a>
+            {% if request.user|is_coil_in %}
             <a href="{% url 'coil:add_pallet' coil.pk %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow">
                 + เพิ่มพาเลท
             </a>
+            {% endif %}
         </div>
     </div>
 
@@ -41,9 +45,11 @@
                 <p class="text-sm text-gray-600">{{ pallet.type0.name }} ({{ pallet.type0.thickness }} x {{ pallet.type0.width }})</p>
             </div>
             <div>
+                {% if request.user|is_adjuster %}
                 <a href="{% url 'coil:edit_pallet' coil.pk pallet.pk %}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded shadow">
                     แก้ไข
                 </a>
+                {% endif %}
             </div>
         </div>
         <div class="p-6">
