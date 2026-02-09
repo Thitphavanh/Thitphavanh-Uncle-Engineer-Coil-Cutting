@@ -42,17 +42,17 @@ def setup_rbac():
         {
             'username': 'user1',
             'password': 'PWD123123',
-            'groups': ['SKU_Manager', 'Coil_In', 'Coil_Out', 'Adjuster', 'Viewer']
+            'groups': ['SKU_Manager', 'Coil_In', 'Coil_Out', 'Adjuster']
         },
         {
             'username': 'user2',
             'password': 'pass2233',
-            'groups': ['Coil_In', 'Coil_Out', 'Viewer']
+            'groups': ['Coil_In', 'Coil_Out']
         },
         {
             'username': 'user3',
             'password': 'ppp3344',
-            'groups': ['Coil_Out', 'Viewer']
+            'groups': ['Coil_Out']
         },
         {
             'username': 'view4',
