@@ -4,3 +4,5 @@ server/privateKey.ppk
 db.sqlite3
 .env
 venv
+__pycache__/
+*.pyc
