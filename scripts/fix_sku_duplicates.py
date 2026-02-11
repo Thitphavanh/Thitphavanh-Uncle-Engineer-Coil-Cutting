@@ -82,8 +82,8 @@ def fix():
                 # Delete duplicates
                 # Use raw SQL to delete to avoid any model validation/signal issues since model mismatch
                 with connection.cursor() as cursor:
-                     placeholders = ','.join(['?'] * len(dup_ids))
-                     cursor.execute(f"DELETE FROM coil_sku WHERE id IN ({placeholders})", dup_ids)
+                     placeholders = ','.join(['%s'] * len(dup_ids))
+                     cursor.execute(f"DELETE FROM coil_sku WHERE id IN ({placeholders})", tuple(dup_ids))
     
     print(f"Cleanup complete. Processed {duplicates_found} groups of duplicates.")
 
