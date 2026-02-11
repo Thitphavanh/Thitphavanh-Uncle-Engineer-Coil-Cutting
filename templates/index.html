@@ -93,18 +93,34 @@
                 <form method="post" class="space-y-4">
                     {% csrf_token %}
                     
+                    {% if form.non_field_errors %}
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">
+                                    {{ form.non_field_errors }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
                     <!-- Top Section -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.name.label }}</label>{{ form.name }}</div>
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.Type0.label }}</label>{{ form.Type0 }}</div>
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.Type1.label }}</label>{{ form.Type1 }}</div>
+                        <div><label class="block text-sm font-medium text-gray-700">{{ form.Type0.label }} <span class="text-red-500">*</span></label>{{ form.Type0 }}</div>
+                        <div><label class="block text-sm font-medium text-gray-700">{{ form.Type1.label }} <span class="text-red-500">*</span></label>{{ form.Type1 }}</div>
                         <div><label class="block text-sm font-medium text-gray-700">{{ form.Type2.label }}</label>{{ form.Type2 }}</div>
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.thickness.label }}</label>{{ form.thickness }}</div>
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.width.label }}</label>{{ form.width }}</div>
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.length.label }}</label>{{ form.length }}</div>
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.color.label }}</label>{{ form.color }}</div>
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.grade.label }}</label>{{ form.grade }}</div>
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.manufacturer.label }}</label>{{ form.manufacturer }}</div>
+                        <div><label class="block text-sm font-medium text-gray-700">{{ form.thickness.label }} <span class="text-red-500">*</span></label>{{ form.thickness }}</div>
+                        <div><label class="block text-sm font-medium text-gray-700">{{ form.width.label }} <span class="text-red-500">*</span></label>{{ form.width }}</div>
+                        <div><label class="block text-sm font-medium text-gray-700">{{ form.length.label }} <span class="text-red-500">*</span></label>{{ form.length }}</div>
+                        <div><label class="block text-sm font-medium text-gray-700">{{ form.color.label }} <span class="text-red-500">*</span></label>{{ form.color }}</div>
+                        <div><label class="block text-sm font-medium text-gray-700">{{ form.grade.label }} <span class="text-red-500">*</span></label>{{ form.grade }}</div>
+                        <div><label class="block text-sm font-medium text-gray-700">{{ form.manufacturer.label }} <span class="text-red-500">*</span></label>{{ form.manufacturer }}</div>
                     </div>
 
                     <!-- Separator -->
@@ -119,8 +135,20 @@
 
                     <!-- Bottom Section -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.note1.label }}</label>{{ form.note1 }}</div>
-                        <div><label class="block text-sm font-medium text-gray-700">{{ form.note2.label }}</label>{{ form.note2 }}</div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">{{ form.note1.label }} <span class="text-red-500">*</span></label>
+                            {{ form.note1 }}
+                            {% if form.note1.errors %}
+                                <p class="text-red-500 text-xs italic">{{ form.note1.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">{{ form.note2.label }}</label>
+                            {{ form.note2 }}
+                            {% if form.note2.errors %}
+                                <p class="text-red-500 text-xs italic">{{ form.note2.errors.0 }}</p>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">

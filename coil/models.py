@@ -39,35 +39,39 @@ class CoilIn(models.Model):
         return self.lot or f"CoilIn #{self.pk}"
 
 class SKU(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
-    Type0 = models.CharField(max_length=255, null=True, blank=True)
-    Type1 = models.CharField(max_length=255, null=True, blank=True)
-    Type2 = models.CharField(max_length=255, null=True, blank=True)
-    thickness = models.CharField(max_length=255, null=True, blank=True,verbose_name='หนา')
-    width = models.CharField(max_length=255, null=True, blank=True,verbose_name='กว้าง')
-    length = models.CharField(max_length=255, null=True, blank=True,verbose_name='ยาว')
-    color = models.CharField(max_length=255, null=True, blank=True)
-    grade = models.CharField(max_length=255, null=True, blank=True)
+    Type0 = models.CharField(max_length=255, default='')
+    Type1 = models.CharField(max_length=255, default='')
+    Type2 = models.CharField(max_length=255, default='', blank=True)
+    thickness = models.CharField(max_length=255, default='', verbose_name='หนา')
+    width = models.CharField(max_length=255, default='', verbose_name='กว้าง')
+    length = models.CharField(max_length=255, default='', verbose_name='ยาว')
+    color = models.CharField(max_length=255, default='')
+    grade = models.CharField(max_length=255, default='')
     manufacturer = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    note1 = models.CharField(max_length=255, null=True, blank=True, verbose_name='Note1 ขอบ กับ HRC')
-    note2 = models.CharField(max_length=255, null=True, blank=True)
+    note1 = models.CharField(max_length=255, default='', verbose_name='Note1 ขอบ กับ HRC')
+    note2 = models.CharField(max_length=255, default='', blank=True, verbose_name='หมายเหตุ')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['Type0', 'Type1', 'Type2', 'thickness', 'width', 'length', 'color', 'grade', 'manufacturer', 'note1', 'note2'],
+                name='unique_sku_combination'
+            )
+        ]
 
     def __str__(self):
         # Example format: เหล็กแผ่น ตปท-2T-1.6x89xC-FGY-85sk-D1-SE 4648
         
         # 1. Join dimensions
-        dims = "x".join(filter(None, [str(self.thickness or '') if self.thickness else '', 
-                                    str(self.width or '') if self.width else '', 
-                                    str(self.length or '') if self.length else '']))
+        dims = "x".join(filter(None, [self.thickness, self.width, self.length]))
         
         # Clean color (strip Thai characters)
-        color_val = str(self.color) if self.color else ''
+        color_val = self.color
         if color_val:
             color_val = re.sub(r'[\u0E00-\u0E7F]+', '', color_val)
 
         # 2. Collect dash-separated parts
         parts = []
-        if self.name: parts.append(str(self.name))
         if self.Type0: parts.append(str(self.Type0))
         if self.Type1: parts.append(str(self.Type1))
         if self.Type2: parts.append(str(self.Type2))

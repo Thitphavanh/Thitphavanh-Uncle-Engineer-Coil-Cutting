@@ -128,7 +128,6 @@ class SKUForm(forms.ModelForm):
         model = SKU
         fields = '__all__'
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
             'Type0': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
             'Type1': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
             'Type2': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
@@ -142,7 +141,6 @@ class SKUForm(forms.ModelForm):
             'note2': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
         }
         labels = {
-            'name': 'ชื่อ',
             'Type0': 'ประเภท 0',
             'Type1': 'ประเภท 1',
             'Type2': 'ประเภท 2',
@@ -153,5 +151,5 @@ class SKUForm(forms.ModelForm):
             'grade': 'เกรด',
             'manufacturer': 'ผู้ผลิต',
             'note1': 'หมายเหตุ 1',
-            'note2': 'หมายเหตุ 2',
+            'note2': 'หมายเหตุ',
         }
