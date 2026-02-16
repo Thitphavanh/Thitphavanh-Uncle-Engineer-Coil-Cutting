@@ -1,28 +1,41 @@
+
 from django import template
+from django.contrib.auth.models import Group
 
 register = template.Library()
 
-def check_group(user, group_name):
+@register.filter(name='has_group')
+def has_group(user, group_name):
     if user.is_superuser:
         return True
     return user.groups.filter(name=group_name).exists()
 
-@register.filter(name='has_group') 
-def has_group(user, group_name):
-    return check_group(user, group_name)
-
 @register.filter(name='is_sku_manager')
 def is_sku_manager(user):
-    return check_group(user, 'SKU_Manager')
+    if user.is_superuser:
+        return True
+    return user.groups.filter(name='SKU_Manager').exists()
 
 @register.filter(name='is_coil_in')
 def is_coil_in(user):
-    return check_group(user, 'Coil_In')
+    if user.is_superuser:
+        return True
+    return user.groups.filter(name='Coil_In').exists()
 
 @register.filter(name='is_coil_out')
 def is_coil_out(user):
-    return check_group(user, 'Coil_Out') or check_group(user, 'Coil_In')
+    if user.is_superuser:
+        return True
+    return user.groups.filter(name__in=['Coil_Out', 'Coil_In']).exists()
 
 @register.filter(name='is_adjuster')
 def is_adjuster(user):
-    return check_group(user, 'Adjuster')
+    if user.is_superuser:
+        return True
+    return user.groups.filter(name='Adjuster').exists()
+
+@register.filter(name='is_viewer')
+def is_viewer(user):
+    if user.is_superuser:
+        return True
+    return user.groups.filter(name__in=['Viewer', 'Coil_In', 'Coil_Out', 'Adjuster', 'SKU_Manager']).exists() or user.is_authenticated

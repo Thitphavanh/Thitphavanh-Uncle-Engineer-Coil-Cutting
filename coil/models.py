@@ -154,6 +154,43 @@ class NW(models.Model):
     def __str__(self):
         return self.label.name or f"NW #{self.pk}"
 
+class Job(models.Model):
+    date_job = models.DateField(null=True, blank=True)
+    job_number = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.job_number or "Job Without Number"
+
+    job_name_short = models.CharField(max_length=255, null=True, blank=True)
+    job_qty = models.CharField(max_length=255, null=True, blank=True)
+    job_duefin = models.CharField(max_length=255, null=True, blank=True)
+    job_note_job = models.CharField(max_length=255, null=True, blank=True)
+    job_note_process = models.CharField(max_length=255, null=True, blank=True)
+    job_note_packing = models.CharField(max_length=255, null=True, blank=True)
+    job_process_1 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_1_duefin = models.CharField(max_length=255, null=True, blank=True)
+    job_process_2 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_2_duefin = models.CharField(max_length=255, null=True, blank=True)
+    job_process_3 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_3_duefin = models.CharField(max_length=255, null=True, blank=True)
+    job_process_4 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_4_duefin = models.CharField(max_length=255, null=True, blank=True)
+    job_process_5 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_6 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_7 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_8 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_9 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_10 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_11 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_12 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_13 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_14 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_15 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_16 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_17 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_18 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_19 = models.CharField(max_length=255, null=True, blank=True)
+    job_process_20 = models.CharField(max_length=255, null=True, blank=True)
 
 class CoilOut(models.Model):
     timestamp1 = models.DateTimeField(null=True, blank=True)
@@ -164,12 +201,12 @@ class CoilOut(models.Model):
     full_coil_partial = models.CharField(max_length=255, null=True, blank=True, verbose_name='เต็มม้วน/บางส่วน')
     coil_kg = models.FloatField(null=True, blank=True, verbose_name='Coil-Kg')
     type0 = models.CharField(max_length=255, null=True, blank=True)
-    job_number = models.CharField(max_length=255, null=True, blank=True)
-    job_name_short = models.CharField(max_length=255, null=True, blank=True)
-    job_qty = models.CharField(max_length=255, null=True, blank=True)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, null=True, blank=True)
     department_cutting = models.CharField(max_length=255, null=True, blank=True, verbose_name='แผนกที่ตัด')
     note_1 = models.CharField(max_length=255, null=True, blank=True, verbose_name='Note-1')
    
 
     def __str__(self):
         return str(self.coil_number) if self.coil_number else f"CoilOut #{self.pk}"
+
+

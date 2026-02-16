@@ -100,6 +100,44 @@
             const weightInput = document.getElementById('id_coil_kg');
             let activeCoilWeight = 0;
 
+            // Job Auto-fill Logic
+            const jobNumberSelect = document.getElementById('id_job_number');
+            const jobNameInput = document.getElementById('id_job_name_short');
+            const jobQtyInput = document.getElementById('id_job_qty');
+
+            if (jobNumberSelect) {
+                 // Initialize Select2 for Job Number if not already (assuming new field isn't auto-inited by older code)
+                 $(jobNumberSelect).select2({
+                    placeholder: 'ค้นหาเลขงาน',
+                    allowClear: true,
+                    width: '100%'
+                });
+
+                $(jobNumberSelect).on('change', function() {
+                    this.dispatchEvent(new Event('change'));
+                });
+
+                jobNumberSelect.addEventListener('change', function() {
+                    const jobId = this.value;
+                    if (jobId) {
+                        fetch(`/api/get-job-details/${jobId}/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    console.error('Error fetching job:', data.error);
+                                } else {
+                                    if (jobNameInput) jobNameInput.value = data.job_name_short || '';
+                                    if (jobQtyInput) jobQtyInput.value = data.job_qty || '';
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                    } else {
+                        if (jobNameInput) jobNameInput.value = '';
+                        if (jobQtyInput) jobQtyInput.value = '';
+                    }
+                });
+            }
+
             if (coilSelect && skuSelect) {
                 // Store original SKU select HTML to restore if needed
                 const originalSkuHTML = skuSelect.innerHTML;

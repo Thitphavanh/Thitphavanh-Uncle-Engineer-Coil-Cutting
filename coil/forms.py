@@ -1,24 +1,22 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import CoilIn, CoilPallet, CoilNumber, SKU, CoilOut
+from .models import CoilIn, CoilPallet, CoilNumber, SKU, CoilOut, Job
 
 class CoilInForm(forms.ModelForm):
     class Meta:
         model = CoilIn
-        fields = ['timestamp1', 'user', 'lot', 'supplier', 'owner']
+        fields = ['timestamp1', 'lot', 'supplier', 'owner']
         widgets = {
              'timestamp1': forms.DateTimeInput(attrs={
                  'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 datetimepicker',
                  'placeholder': 'YYYY-MM-DD HH:MM'
              }, format='%Y-%m-%d %H:%M'),
-             'user': forms.Select(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
              'lot': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
              'supplier': forms.Select(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
              'owner': forms.Select(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
         }
         labels = {
             'timestamp1': 'วันที่/เวลา',
-            'user': 'ผู้ใช้งาน',
             'lot': 'ล็อต',
             'supplier': 'ผู้จำหน่าย',
             'owner': 'เจ้าของ',
@@ -56,12 +54,34 @@ CoilNumberFormSet = inlineformset_factory(
 )
 
 class CoilOutForm(forms.ModelForm):
+    job_number = forms.ModelChoiceField(
+        queryset=Job.objects.all(),
+        label='เลขงาน',
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
+        })
+    )
+    job_name_short = forms.CharField(
+        label='ชื่องาน (ย่อ)',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
+        })
+    )
+    job_qty = forms.CharField(
+        label='จำนวน (ชิ้น)',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
+        })
+    )
+
     class Meta:
         model = CoilOut
         fields = [
-            'timestamp1', 'user', 'coil_number', 'sku',
+            'timestamp1', 'coil_number', 'sku',
             'full_coil_partial', 'coil_kg', 'type0',
-            'job_number', 'job_name_short', 'job_qty',
             'department_cutting', 'note_1'
         ]
         widgets = {
@@ -69,9 +89,6 @@ class CoilOutForm(forms.ModelForm):
                 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 datetimepicker',
                 'placeholder': 'YYYY-MM-DD HH:MM'
             }, format='%Y-%m-%d %H:%M'),
-            'user': forms.Select(attrs={
-                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
-            }),
             'coil_number': forms.Select(attrs={
                 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
             }),
@@ -92,15 +109,6 @@ class CoilOutForm(forms.ModelForm):
             'type0': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
             }),
-            'job_number': forms.TextInput(attrs={
-                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
-            }),
-            'job_name_short': forms.TextInput(attrs={
-                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
-            }),
-            'job_qty': forms.TextInput(attrs={
-                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
-            }),
             'department_cutting': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
             }),
@@ -110,17 +118,36 @@ class CoilOutForm(forms.ModelForm):
         }
         labels = {
             'timestamp1': 'วันที่/เวลา',
-            'user': 'ผู้ใช้งาน',
             'coil_number': 'หมายเลขม้วน',
             'sku': 'SKU',
             'full_coil_partial': 'เต็มม้วน/บางส่วน',
             'coil_kg': 'น้ำหนัก (kg)',
             'type0': 'ประเภท',
-            'job_number': 'เลขงาน',
-            'job_name_short': 'ชื่องาน (ย่อ)',
-            'job_qty': 'จำนวน (ชิ้น)',
             'department_cutting': 'แผนกที่ตัด',
             'note_1': 'หมายเหตุ',
+        }
+
+    def save(self, commit=True):
+        instance = super(CoilOutForm, self).save(commit=False)
+        # Use the selected Job instance directly
+        instance.job = self.cleaned_data.get('job_number')
+        if commit:
+            instance.save()
+        return instance
+
+class JobForm(forms.ModelForm):
+    class Meta:
+        model = Job
+        fields = '__all__'
+        widgets = {
+            'date_job': forms.DateInput(attrs={
+                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50',
+                'type': 'date'
+            }),
+            'job_number': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
+            'job_name_short': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
+            'job_qty': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'}),
+            # Add other fields as needed, keeping generic style for now
         }
 
 class SKUForm(forms.ModelForm):
