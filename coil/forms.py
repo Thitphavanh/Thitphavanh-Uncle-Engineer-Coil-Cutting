@@ -109,7 +109,7 @@ class CoilOutForm(forms.ModelForm):
             'type0': forms.TextInput(attrs={
                 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
             }),
-            'department_cutting': forms.TextInput(attrs={
+            'department_cutting': forms.Select(attrs={
                 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
             }),
             'note_1': forms.TextInput(attrs={

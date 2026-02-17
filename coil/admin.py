@@ -118,6 +118,10 @@ class JobAdmin(admin.ModelAdmin):
     list_display = ['job_number', 'job_name_short', 'job_qty', 'date_job']
     search_fields = ['job_number', 'job_name_short']
 
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'description', 'created_at']
+    search_fields = ['name', 'description']
+
 # Register your models here.
 admin.site.register(Profile)
 admin.site.register(Supplier)
@@ -130,4 +134,5 @@ admin.site.register(Label, LabelAdmin)
 admin.site.register(NW)
 admin.site.register(CoilOut, CoilOutAdmin)
 admin.site.register(Job, JobAdmin)
+admin.site.register(Department, DepartmentAdmin)
 

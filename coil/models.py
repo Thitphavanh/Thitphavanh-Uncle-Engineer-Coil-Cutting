@@ -192,6 +192,18 @@ class Job(models.Model):
     job_process_19 = models.CharField(max_length=255, null=True, blank=True)
     job_process_20 = models.CharField(max_length=255, null=True, blank=True)
 
+class Department(models.Model):
+    name = models.CharField(max_length=255, unique=True, verbose_name='ชื่อแผนก')
+    description = models.TextField(null=True, blank=True, verbose_name='คำอธิบาย')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'แผนกที่ตัด'
+        verbose_name_plural = 'แผนกที่ตัด'
+
 class CoilOut(models.Model):
     timestamp1 = models.DateTimeField(null=True, blank=True)
     timestamp2 = models.DateField(auto_now=True)
@@ -202,7 +214,7 @@ class CoilOut(models.Model):
     coil_kg = models.FloatField(null=True, blank=True, verbose_name='Coil-Kg')
     type0 = models.CharField(max_length=255, null=True, blank=True)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, null=True, blank=True)
-    department_cutting = models.CharField(max_length=255, null=True, blank=True, verbose_name='แผนกที่ตัด')
+    department_cutting = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='แผนกที่ตัด')
     note_1 = models.CharField(max_length=255, null=True, blank=True, verbose_name='Note-1')
    
 
