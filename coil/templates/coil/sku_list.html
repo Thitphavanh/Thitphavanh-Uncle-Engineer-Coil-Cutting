@@ -16,12 +16,42 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
-                    Export CSV (Google Sheets)
+                    Export CSV
                 </a>
                 <a href="{% url 'coil:index' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
                     กลับ
                 </a>
             </div>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">ค้นหาทั่วไป</label>
+                    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Type0, Type1, Note1..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-10 px-3">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Type0</label>
+                    <input type="text" name="type0" value="{{ request.GET.type0 }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-10 px-3">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">ความหนา</label>
+                    <input type="text" name="thickness" value="{{ request.GET.thickness }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-10 px-3">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">ความกว้าง</label>
+                    <input type="text" name="width" value="{{ request.GET.width }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-10 px-3">
+                </div>
+                <div class="md:col-span-4 flex justify-end">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded">
+                        ค้นหา
+                    </button>
+                    <a href="{% url 'coil:sku_list' %}" class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded">
+                        ล้าง
+                    </a>
+                </div>
+            </form>
         </div>
 
         <div class="overflow-x-auto">
@@ -37,6 +67,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สี</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เกรด</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้ผลิต</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note1 ขอบ กับ HRC</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -51,10 +82,11 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sku.color }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sku.grade }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sku.manufacturer }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ sku.note1|default:"-" }}</td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">ไม่มีข้อมูล SKU</td>
+                        <td colspan="10" class="px-6 py-4 text-center text-sm text-gray-500">ไม่มีข้อมูล SKU</td>
                     </tr>
                     {% endfor %}
                 </tbody>

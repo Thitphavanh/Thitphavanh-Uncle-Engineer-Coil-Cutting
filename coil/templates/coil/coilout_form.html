@@ -104,6 +104,9 @@
             const jobNumberSelect = document.getElementById('id_job_number');
             const jobNameInput = document.getElementById('id_job_name_short');
             const jobQtyInput = document.getElementById('id_job_qty');
+            const departmentSelect = document.getElementById('id_department_cutting');
+            const coilKgInput = document.getElementById('id_coil_kg');
+            const type0Input = document.getElementById('id_type0');
 
             if (jobNumberSelect) {
                  // Initialize Select2 for Job Number if not already (assuming new field isn't auto-inited by older code)
@@ -120,20 +123,58 @@
                 jobNumberSelect.addEventListener('change', function() {
                     const jobId = this.value;
                     if (jobId) {
-                        fetch(`/api/get-job-details/${jobId}/`)
-                            .then(response => response.json())
+                        // Build URL - no /coil/ prefix needed since coil urls are at root
+                        const url = `/api/get-job-details/${jobId}/`;
+                        console.log('Fetching job details from:', url);
+
+                        fetch(url)
+                            .then(response => {
+                                console.log('Job details response status:', response.status);
+                                if (!response.ok) {
+                                    return response.json().then(data => {
+                                        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                                    }).catch(() => {
+                                        throw new Error(`HTTP error! status: ${response.status}`);
+                                    });
+                                }
+                                return response.json();
+                            })
                             .then(data => {
+                                console.log('Job details received:', data);
                                 if (data.error) {
                                     console.error('Error fetching job:', data.error);
+                                    alert('ไม่สามารถดึงข้อมูลงานได้: ' + data.error);
                                 } else {
                                     if (jobNameInput) jobNameInput.value = data.job_name_short || '';
                                     if (jobQtyInput) jobQtyInput.value = data.job_qty || '';
+                                    if (departmentSelect && data.department_id) {
+                                        departmentSelect.value = data.department_id;
+                                        console.log('Department auto-filled:', data.department_id);
+                                    } else if (departmentSelect) {
+                                        departmentSelect.value = ''; // Reset if not found
+                                    }
+                                    // Auto-fill น้ำหนัก (kg) และ ประเภท from Job
+                                    if (coilKgInput && data.coil_kg) {
+                                        coilKgInput.value = data.coil_kg;
+                                        console.log('Coil kg auto-filled:', data.coil_kg);
+                                    }
+                                    if (type0Input && data.type0) {
+                                        type0Input.value = data.type0;
+                                        console.log('Type0 auto-filled:', data.type0);
+                                    }
                                 }
                             })
-                            .catch(error => console.error('Error:', error));
+                            .catch(error => {
+                                console.error('Error fetching job details:', error);
+                                alert('เกิดข้อผิดพลาดในการดึงข้อมูลงาน: ' + error.message);
+                            });
                     } else {
+                        // Clear all fields when no job is selected
                         if (jobNameInput) jobNameInput.value = '';
                         if (jobQtyInput) jobQtyInput.value = '';
+                        if (departmentSelect) departmentSelect.value = '';
+                        if (coilKgInput) coilKgInput.value = '';
+                        if (type0Input) type0Input.value = '';
                     }
                 });
             }
@@ -196,7 +237,7 @@
                         const originalSkuText = skuSelect.options[skuSelect.selectedIndex]?.text; // Keep current if valid? No, usually loading.
                         skuSelect.innerHTML = '<option value="">กำลังโหลด...</option>';
 
-                        // Build URL with correct path including 'coil' prefix
+                        // Build URL - no /coil/ prefix needed since coil urls are at root
                         const url = `/api/get-sku/${coilId}/`;
                         console.log('Fetching SKU from:', url);
 

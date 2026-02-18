@@ -3,6 +3,7 @@ from django.views.generic import CreateView, DetailView, ListView
 from django.urls import reverse
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.decorators import user_passes_test
+from django.db.models import Sum, Q 
 from .models import CoilIn, CoilPallet, CoilOut, CoilNumber, Job, SKU
 from django.contrib import messages
 from .forms import CoilInForm, CoilPalletForm, CoilNumberFormSet, CoilOutForm, SKUForm, JobForm
@@ -236,12 +237,48 @@ def get_coil_sku(request, pk):
 
 @user_passes_test(is_coil_out)
 def get_job_details(request, pk):
-    """API endpoint to get Job details (name, qty) for a job number (AJAX requests only)"""
+    """API endpoint to get Job details (name, qty, department) for a job number (AJAX requests only)"""
     try:
         job = Job.objects.get(pk=pk)
+        department_id = None
+
+        # Try to find a department matching job_process_1 (Cutting process)
+        if job.job_process_1:
+            from .models import Department
+            try:
+                # Trimming whitespace
+                process_name = job.job_process_1.strip()
+
+                # Try exact match first (case-insensitive)
+                department = Department.objects.filter(name__iexact=process_name).first()
+
+                # If not found, try partial match with key words
+                if not department:
+                    # Extract keywords from process name (remove common prefixes like S1-, S2-, etc.)
+                    import re
+                    # Remove pattern like S1-, S2-, 1-, 2- etc at the beginning
+                    cleaned_process = re.sub(r'^[sS]?\d+-?', '', process_name).strip()
+                    print(f"DEBUG: Searching department. Original: '{process_name}', Cleaned: '{cleaned_process}'")
+
+                    # Try to find department containing the cleaned keyword
+                    if cleaned_process:
+                        department = Department.objects.filter(name__icontains=cleaned_process).first()
+
+                if department:
+                    department_id = department.id
+                    print(f"DEBUG: Found department ID {department_id}: {department.name}")
+                else:
+                    print(f"DEBUG: No department found for process: {process_name}")
+
+            except Exception as e:
+                print(f"Error finding department: {e}")
+
         return JsonResponse({
-            'job_name_short': job.job_name_short,
-            'job_qty': job.job_qty
+            'job_name_short': job.job_name_short or '',
+            'job_qty': job.job_qty or '',
+            'department_id': department_id,
+            'coil_kg': job.job_process_1 or '',  # น้ำหนัก (kg) from job_process_1
+            'type0': job.job_process_1_duefin or ''  # ประเภท from job_process_1_duefin
         })
     except Job.DoesNotExist:
         return JsonResponse({'error': 'Job not found'}, status=404)
@@ -304,6 +341,7 @@ class JobDeleteView(UserPassesTestMixin, DeleteView):
         return is_sku_manager(self.request.user)
 
 # List Views for Export
+# List Views for Export
 class SKUListView(UserPassesTestMixin, ListView):
     model = SKU
     template_name = 'coil/sku_list.html'
@@ -312,6 +350,34 @@ class SKUListView(UserPassesTestMixin, ListView):
 
     def test_func(self):
         return is_viewer(self.request.user)
+        
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        # Filtering
+        q = self.request.GET.get('q')
+        type0 = self.request.GET.get('type0')
+        thickness = self.request.GET.get('thickness')
+        width = self.request.GET.get('width')
+        
+        if q:
+            queryset = queryset.filter(
+                Q(Type0__icontains=q) |
+                Q(Type1__icontains=q) |
+                Q(note1__icontains=q) |
+                Q(grade__icontains=q)
+            )
+        
+        if type0:
+            queryset = queryset.filter(Type0__icontains=type0)
+        
+        if thickness:
+            queryset = queryset.filter(thickness__icontains=thickness)
+            
+        if width:
+            queryset = queryset.filter(width__icontains=width)
+            
+        return queryset
 
 class CoilPalletListView(UserPassesTestMixin, ListView):
     model = CoilPallet
@@ -322,6 +388,28 @@ class CoilPalletListView(UserPassesTestMixin, ListView):
     def test_func(self):
         return is_viewer(self.request.user)
 
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('coilin', 'type0', 'coilin__supplier')
+        
+        # Filtering
+        q = self.request.GET.get('q') # General search (Lot, Pallet Number)
+        sku = self.request.GET.get('sku')
+        
+        if q:
+            queryset = queryset.filter(
+                Q(number__icontains=q) |
+                Q(coilin__lot__icontains=q)
+            )
+            
+        if sku:
+             queryset = queryset.filter(
+                Q(type0__Type0__icontains=sku) |
+                Q(type0__thickness__icontains=sku) |
+                Q(type0__width__icontains=sku)
+             )
+            
+        return queryset
+
 class CoilNumberListView(UserPassesTestMixin, ListView):
     model = CoilNumber
     template_name = 'coil/coilnumber_list.html'
@@ -330,6 +418,21 @@ class CoilNumberListView(UserPassesTestMixin, ListView):
 
     def test_func(self):
         return is_viewer(self.request.user)
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('coilpallet', 'coilpallet__coilin', 'coilpallet__type0')
+        
+        # Filtering
+        q = self.request.GET.get('q') # General search (Coil Number, Pallet Number, Lot)
+        
+        if q:
+            queryset = queryset.filter(
+                Q(number__icontains=q) |
+                Q(coilpallet__number__icontains=q) |
+                Q(coilpallet__coilin__lot__icontains=q)
+            )
+            
+        return queryset
 
 # Export Views
 from django.http import HttpResponse

@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -7,37 +6,391 @@
 
     <form method="post">
         {% csrf_token %}
-        
-        <div class="grid grid-cols-1 gap-6">
-            {% for field in form %}
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ field.label }}
-                    {% if field.field.required %}
-                    <span class="text-red-500">*</span>
-                    {% endif %}
-                </label>
-                {{ field }}
-                {% if field.help_text %}
-                <p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>
-                {% endif %}
-                {% if field.errors %}
-                <p class="text-xs text-red-500 mt-1">{{ field.errors.0 }}</p>
-                {% endif %}
+
+        <!-- Basic Information Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">ข้อมูลพื้นฐาน</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.date_job.label }}</label>
+                    {{ form.date_job }}
+                    {% if form.date_job.errors %}<p class="text-xs text-red-500 mt-1">{{ form.date_job.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.job_number.label }}</label>
+                    {{ form.job_number }}
+                    {% if form.job_number.errors %}<p class="text-xs text-red-500 mt-1">{{ form.job_number.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.job_name_short.label }}</label>
+                    {{ form.job_name_short }}
+                    {% if form.job_name_short.errors %}<p class="text-xs text-red-500 mt-1">{{ form.job_name_short.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.job_qty.label }}</label>
+                    {{ form.job_qty }}
+                    {% if form.job_qty.errors %}<p class="text-xs text-red-500 mt-1">{{ form.job_qty.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.job_duefin.label }}</label>
+                    {{ form.job_duefin }}
+                    {% if form.job_duefin.errors %}<p class="text-xs text-red-500 mt-1">{{ form.job_duefin.errors.0 }}</p>{% endif %}
+                </div>
             </div>
-            {% endfor %}
+        </div>
+
+        <!-- Notes Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">หมายเหตุ</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.job_note_job.label }}</label>
+                    {{ form.job_note_job }}
+                    {% if form.job_note_job.errors %}<p class="text-xs text-red-500 mt-1">{{ form.job_note_job.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.job_note_process.label }}</label>
+                    {{ form.job_note_process }}
+                    {% if form.job_note_process.errors %}<p class="text-xs text-red-500 mt-1">{{ form.job_note_process.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ form.job_note_packing.label }}</label>
+                    {{ form.job_note_packing }}
+                    {% if form.job_note_packing.errors %}<p class="text-xs text-red-500 mt-1">{{ form.job_note_packing.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Section (2-Column Grid) -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">กระบวนการทำงาน (Process)</h3>
+
+            <!-- Process 1 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 1</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 1</label>
+                        {{ form.job_process_1 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 1</label>
+                        {{ form.job_process_1_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 2 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 2</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 2</label>
+                        {{ form.job_process_2 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 2</label>
+                        {{ form.job_process_2_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 3 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 3</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 3</label>
+                        {{ form.job_process_3 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 3</label>
+                        {{ form.job_process_3_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 4 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 4</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 4</label>
+                        {{ form.job_process_4 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 4</label>
+                        {{ form.job_process_4_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 5 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 5</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 5</label>
+                        {{ form.job_process_5 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 5</label>
+                        {{ form.job_process_5_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 6 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 6</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 6</label>
+                        {{ form.job_process_6 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 6</label>
+                        {{ form.job_process_6_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 7 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 7</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 7</label>
+                        {{ form.job_process_7 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 7</label>
+                        {{ form.job_process_7_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 8 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 8</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 8</label>
+                        {{ form.job_process_8 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 8</label>
+                        {{ form.job_process_8_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 9 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 9</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 9</label>
+                        {{ form.job_process_9 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 9</label>
+                        {{ form.job_process_9_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 10 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 10</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 10</label>
+                        {{ form.job_process_10 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 10</label>
+                        {{ form.job_process_10_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 11 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 11</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 11</label>
+                        {{ form.job_process_11 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 11</label>
+                        {{ form.job_process_11_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 12 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 12</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 12</label>
+                        {{ form.job_process_12 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 12</label>
+                        {{ form.job_process_12_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 13 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 13</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 13</label>
+                        {{ form.job_process_13 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 13</label>
+                        {{ form.job_process_13_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 14 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 14</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 14</label>
+                        {{ form.job_process_14 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 14</label>
+                        {{ form.job_process_14_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 15 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 15</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 15</label>
+                        {{ form.job_process_15 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 15</label>
+                        {{ form.job_process_15_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 16 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 16</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 16</label>
+                        {{ form.job_process_16 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 16</label>
+                        {{ form.job_process_16_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 17 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 17</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 17</label>
+                        {{ form.job_process_17 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 17</label>
+                        {{ form.job_process_17_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 18 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 18</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 18</label>
+                        {{ form.job_process_18 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 18</label>
+                        {{ form.job_process_18_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 19 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 19</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 19</label>
+                        {{ form.job_process_19 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 19</label>
+                        {{ form.job_process_19_duefin }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process 20 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold mb-3 text-gray-700">Process 20</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Process 20</label>
+                        {{ form.job_process_20 }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Due Fin 20</label>
+                        {{ form.job_process_20_duefin }}
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="mt-8 flex justify-end gap-3">
-            <a href="{% url 'coil:job_list' %}" 
+            <a href="{% url 'coil:job_list' %}"
                class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-6 rounded">
                 ยกเลิก
             </a>
-            <button type="submit" 
+            <button type="submit"
                     class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded">
                 บันทึก
             </button>
         </div>
     </form>
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Flatpickr for all date fields
+            flatpickr(".datepicker", {
+                dateFormat: "Y-m-d",
+                allowInput: true
+            });
+        });
+    </script>
 </div>
 {% endblock %}
